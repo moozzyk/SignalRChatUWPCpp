@@ -8,6 +8,25 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Padding="10">
+            <!--
+            <Run>Text run 1.</Run><LineBreak/>
+            <Run>Text run 1.</Run>
+            -->
+        </TextBlock>
+        <Grid Grid.Column="0" Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Message: " Margin="6" />
+            <TextBox Grid.Column="1" Grid.Row="0" Margin="4"/>
+            <Button Grid.Column="2" Grid.Row="0" x:Name="SendMessageButton">Send</Button>
+        </Grid>
     </Grid>
 </Page>

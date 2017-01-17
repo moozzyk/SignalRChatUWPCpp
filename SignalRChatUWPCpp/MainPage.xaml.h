@@ -17,5 +17,7 @@ namespace SignalRChatUWPCpp
 	public:
 		MainPage();
 
-	};
+    private:
+        void StartChatButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+    };
 }

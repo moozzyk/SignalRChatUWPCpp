@@ -5,6 +5,7 @@
 
 #include "pch.h"
 #include "MainPage.xaml.h"
+#include "ChatPage.xaml.h"
 
 using namespace SignalRChatUWPCpp;
 
@@ -24,4 +25,10 @@ using namespace Windows::UI::Xaml::Navigation;
 MainPage::MainPage()
 {
 	InitializeComponent();
+}
+
+
+void SignalRChatUWPCpp::MainPage::StartChatButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+    this->Frame->Navigate(Windows::UI::Xaml::Interop::TypeName(ChatPage::typeid));
 }
