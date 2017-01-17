@@ -35,8 +35,9 @@ void ChatPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^
     this->MessageTextBox->IsEnabled = false;
 
     m_chat_connection = std::make_unique<signalr::hub_connection>(L"http://testsignalrchat.azurewebsites.net");
-    auto proxy = m_chat_connection->create_hub_proxy(L"ChatHub");
-    proxy.on(L"broadcastMessage", [this](const web::json::value& m)
+    m_chat_hub = std::make_unique<signalr::hub_proxy>(m_chat_connection->create_hub_proxy(L"ChatHub"));
+
+    m_chat_hub->on(L"broadcastMessage", [this](const web::json::value& m)
     {
         auto sender = m.at(0).as_string();
         auto message = m.at(1).as_string();
@@ -67,6 +68,30 @@ void ChatPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^
             {
                 this->ChatTextBox->Text =
                     ref new Platform::String((L"Connecting to chat failed" + utility::conversions::to_string_t(e.what())).c_str());
+            }
+        }, ui_ctx);
+}
+
+void SignalRChatUWPCpp::ChatPage::SendMessageButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+    web::json::value args{};
+    args[0] = web::json::value::string(L"WinRT client");
+    args[1] = web::json::value(this->MessageTextBox->Text->Data());
+
+    auto ui_ctx = pplx::task_continuation_context::use_current();
+    m_chat_hub->invoke<void>(L"send", args)
+        .then([this](pplx::task<void> invoke_task)
+        {
+            try
+            {
+                invoke_task.get();
+            }
+            catch (const std::exception& e)
+            {
+                auto error_line = ref new String(
+                    (L"Invoking 'send' function failed:" + utility::conversions::to_string_t(e.what())).c_str());
+                this->ChatTextBox->Text =
+                    String::Concat(this->ChatTextBox->Text, error_line);
             }
         }, ui_ctx);
 }
