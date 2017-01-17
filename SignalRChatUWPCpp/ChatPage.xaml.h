@@ -6,16 +6,20 @@
 #pragma once
 
 #include "ChatPage.g.h"
+#include "signalrclient\hub_connection.h"
 
 namespace SignalRChatUWPCpp
 {
-	/// <summary>
-	/// An empty page that can be used on its own or navigated to within a Frame.
-	/// </summary>
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class ChatPage sealed
 	{
 	public:
 		ChatPage();
+
+    protected:
+        virtual void OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e) override;
+
+    private:
+        std::unique_ptr<signalr::hub_connection> m_chat_connection;
 	};
 }

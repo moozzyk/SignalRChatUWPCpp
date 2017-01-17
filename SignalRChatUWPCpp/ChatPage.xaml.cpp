@@ -9,8 +9,10 @@
 using namespace SignalRChatUWPCpp;
 
 using namespace Platform;
+using namespace Windows::ApplicationModel::Core;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Collections;
+using namespace Windows::UI::Core;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
@@ -24,4 +26,47 @@ using namespace Windows::UI::Xaml::Navigation;
 ChatPage::ChatPage()
 {
 	InitializeComponent();
+}
+
+void ChatPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e)
+{
+    this->ChatTextBox->Text = "Connecting...";
+    this->SendMessageButton->IsEnabled = false;
+    this->MessageTextBox->IsEnabled = false;
+
+    m_chat_connection = std::make_unique<signalr::hub_connection>(L"http://testsignalrchat.azurewebsites.net");
+    auto proxy = m_chat_connection->create_hub_proxy(L"ChatHub");
+    proxy.on(L"broadcastMessage", [this](const web::json::value& m)
+    {
+        auto sender = m.at(0).as_string();
+        auto message = m.at(1).as_string();
+
+        CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(
+            CoreDispatcherPriority::Normal, ref new DispatchedHandler([this, sender, message]()
+        {
+            auto line = ref new String((sender + L": " + message + L"\r\n").c_str());
+            this->ChatTextBox->Text =
+                String::Concat(this->ChatTextBox->Text, line);
+        }));
+    });
+
+    auto ui_ctx = pplx::task_continuation_context::use_current();
+    m_chat_connection->start()
+        .then([this](pplx::task<void> start_task)
+        {
+            Platform::String^ error_message;
+            try
+            {
+                start_task.get();
+                this->ChatTextBox->Text = "Connected\r\n";
+                this->SendMessageButton->IsEnabled = true;
+                this->MessageTextBox->IsEnabled = true;
+
+            }
+            catch (const std::exception& e)
+            {
+                this->ChatTextBox->Text =
+                    ref new Platform::String((L"Connecting to chat failed" + utility::conversions::to_string_t(e.what())).c_str());
+            }
+        }, ui_ctx);
 }
