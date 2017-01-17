@@ -30,5 +30,5 @@ MainPage::MainPage()
 
 void SignalRChatUWPCpp::MainPage::StartChatButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-    this->Frame->Navigate(Windows::UI::Xaml::Interop::TypeName(ChatPage::typeid));
+    this->Frame->Navigate(Windows::UI::Xaml::Interop::TypeName(ChatPage::typeid), this->Name->Text);
 }

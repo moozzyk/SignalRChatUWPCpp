@@ -20,8 +20,10 @@ namespace SignalRChatUWPCpp
         virtual void OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e) override;
 
     private:
+        std::wstring m_name;
         std::unique_ptr<signalr::hub_connection> m_chat_connection;
         std::unique_ptr<signalr::hub_proxy> m_chat_hub;
+
         void SendMessageButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
     };
 }

@@ -30,6 +30,11 @@ ChatPage::ChatPage()
 
 void ChatPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e)
 {
+    if (e->Parameter)
+    {
+        m_name = (static_cast<String ^>(e->Parameter))->Data();
+    }
+
     this->ChatTextBox->Text = "Connecting...";
     this->SendMessageButton->IsEnabled = false;
     this->MessageTextBox->IsEnabled = false;
@@ -75,8 +80,9 @@ void ChatPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^
 void SignalRChatUWPCpp::ChatPage::SendMessageButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
     web::json::value args{};
-    args[0] = web::json::value::string(L"WinRT client");
+    args[0] = web::json::value::string(m_name);
     args[1] = web::json::value(this->MessageTextBox->Text->Data());
+    this->MessageTextBox->Text = L"";
 
     auto ui_ctx = pplx::task_continuation_context::use_current();
     m_chat_hub->invoke<void>(L"send", args)
